@@ -3,15 +3,18 @@
 
 template<typename T>
 class Matrix{
+protected:
     size_t cols_;
     size_t rows_;
     // std::vector<std::vector<T>> mat_;
     std::vector<T> data_;
+    bool is_diagonal_ = false;
 
 public:
     Matrix() : cols_(0), rows_(0){}
     Matrix(size_t size): rows_(size), cols_(size), data_(size * size) {}
     Matrix(size_t rows, size_t cols): rows_(rows), cols_(cols), data_(rows * cols) {}
+    Matrix(size_t rows, size_t cols, T scalar): rows_(rows), cols_(cols), data_(rows * cols, scalar) {}
 
     T& at(size_t row, size_t col) {
         return data_.at(row * cols_ + col);
@@ -19,6 +22,18 @@ public:
 
     const T& at(size_t row, size_t col) const {
         return data_.at(row * cols_ + col);
+    }
+
+    void set_is_diagonal() {
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < cols; ++col) {
+                if (at(row, col) != static_cast<T>(0)) {
+                    is_diagonal_ = false;
+                    return;
+                }
+            }
+        }
+        is_diagonal_ = true;
     }
 
     Matrix<T>& operator+=(const Matrix<T>& other) {
@@ -79,5 +94,6 @@ public:
 
     size_t rows() const { return rows_; }
     size_t cols() const { return cols_; }
+    bool diagonal() const { return is_diagonal_; }
 
 };

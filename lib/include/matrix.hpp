@@ -1,3 +1,6 @@
+#ifndef LIB_MATRIX_HPP
+#define LIB_MATRIX_HPP 1
+
 #include <vector>
 #include <assert.h>
 
@@ -8,7 +11,6 @@ protected:
     size_t rows_;
     // std::vector<std::vector<T>> mat_;
     std::vector<T> data_;
-    bool is_diagonal_ = false;
 
 public:
     Matrix() : cols_(0), rows_(0){}
@@ -22,18 +24,6 @@ public:
 
     const T& at(size_t row, size_t col) const {
         return data_.at(row * cols_ + col);
-    }
-
-    void set_is_diagonal() {
-        for (int row = 0; row < rows; ++row) {
-            for (int col = 0; col < cols; ++col) {
-                if (at(row, col) != static_cast<T>(0)) {
-                    is_diagonal_ = false;
-                    return;
-                }
-            }
-        }
-        is_diagonal_ = true;
     }
 
     Matrix<T>& operator+=(const Matrix<T>& other) {
@@ -94,6 +84,7 @@ public:
 
     size_t rows() const { return rows_; }
     size_t cols() const { return cols_; }
-    bool diagonal() const { return is_diagonal_; }
 
 };
+
+#endif // LIB_MATRIX_HPP

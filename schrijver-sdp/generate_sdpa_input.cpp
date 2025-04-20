@@ -128,7 +128,6 @@ int main() {
     sdpa_input.update_block(0, block_idx, mat);
 
     // condition 2-1
-    std::cerr << "condition 2-1" << std::endl;
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
@@ -152,7 +151,6 @@ int main() {
     }
 
     // condition 2-2
-    std::cerr << "condition 2-2" << std::endl;
     mat = Matrix<float>(1);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
@@ -183,7 +181,6 @@ int main() {
     }
 
     // condition 3
-    std::cerr << "condition 3" << std::endl;
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
@@ -202,7 +199,6 @@ int main() {
 
                     // [[-x_{i2,j2}^t2, 0], [0, x_{i2,j2}^t2]]
                     var_idx = encode_var_index(n, t2, i2, j2);
-                    std::cerr << "(t2, i2, j2, idx) = (" << t2 << ", " << i2 << ", " << j2 << ", " << var_idx << ")" << std::endl;
                     mat.at(0, 0) = -1;
                     mat.at(1, 1) = 1;
                     sdpa_input.update_block(var_idx, block_idx, mat);
@@ -212,7 +208,6 @@ int main() {
     }
 
     // condition 4
-    std::cerr << "condition 4" << std::endl;
     // まとめて1つのブロック
     block_idx = sdpa_input.add_block(2, true);
     for (int t = 0; t <= n; t++) {

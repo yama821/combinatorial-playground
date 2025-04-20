@@ -20,7 +20,6 @@ long long comb(int n, int r) {
 
     long long ret = 1;
     for (int i = 1; i <= r; i++) {
-        ret *= n - i;
         ret = ret * (n - r + i) / i;
     }
     return ret;

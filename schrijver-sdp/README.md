@@ -23,5 +23,7 @@
 ## 参考リンク
 
 [1] [SDPA の使い方](http://www.cc.u-ryukyu.ac.jp/~hide/sdpa.pdf)
+
 [2] [NEOS server での SDPA format](https://plato.asu.edu/ftp/sdpa_format.txt)
+
 [3] [半正定値計画問題に対する主双対内点法の実装と実験的解析](https://dl.ndl.go.jp/pid/3144617/1/78)

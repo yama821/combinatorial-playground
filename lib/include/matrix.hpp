@@ -1,8 +1,12 @@
+#ifndef LIB_MATRIX_HPP
+#define LIB_MATRIX_HPP 1
+
 #include <vector>
 #include <assert.h>
 
 template<typename T>
 class Matrix{
+protected:
     size_t cols_;
     size_t rows_;
     // std::vector<std::vector<T>> mat_;
@@ -12,6 +16,7 @@ public:
     Matrix() : cols_(0), rows_(0){}
     Matrix(size_t size): rows_(size), cols_(size), data_(size * size) {}
     Matrix(size_t rows, size_t cols): rows_(rows), cols_(cols), data_(rows * cols) {}
+    Matrix(size_t rows, size_t cols, T scalar): rows_(rows), cols_(cols), data_(rows * cols, scalar) {}
 
     T& at(size_t row, size_t col) {
         return data_.at(row * cols_ + col);
@@ -81,3 +86,5 @@ public:
     size_t cols() const { return cols_; }
 
 };
+
+#endif // LIB_MATRIX_HPP

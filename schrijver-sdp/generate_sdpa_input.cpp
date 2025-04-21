@@ -11,13 +11,13 @@
 int beta(int n, int t, int i, int j, int k) {
     int ret = 0;
     int sgn = (t % 2 == 0 ? 1: -1);
-    std::cerr << "\t";
+    // std::cerr << "\t";
     for (int u = 0; u <= n; u++) {
         ret += sgn * comb(u, t) * comb(n - 2 * k, u - k) * comb(n - k - u, i - u) * comb(n - k - u, j - u);
-        std::cerr << ret << " ";
+        // std::cerr << ret << " ";
         sgn *= -1;
     }
-    std::cerr << std::endl;
+    // std::cerr << std::endl;
     return ret;
 }
 
@@ -91,7 +91,7 @@ int main() {
                     int var_idx = encode_var_index(n, t, i, j);
                     int b = beta(n, t, i, j, k);
                     if (b == 0) continue;
-                    std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
+                    // std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
                     mat1[var_idx].at(i - k, j - k) += b;
                 }
             }
@@ -214,9 +214,7 @@ int main() {
     }
 
     // condition 4
-    // まとめて1つのブロック
     mat = Matrix<float>(2);
-    block_idx = sdpa_input.add_block(2, true);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
             for (int j = 0; j <= n; j++) {
@@ -226,9 +224,12 @@ int main() {
                 flag |= (1 <= i && i < d);
                 flag |= (1 <= j && j < d);
                 flag |= (1 <= k && k < d);
-
+                
                 if (!flag) continue;
-
+                
+                // std::cerr << "condition4: (t, i, j) = (" << t << ", " << i << ", " << j << ")" << std::endl;
+                
+                block_idx = sdpa_input.add_block(2, true);
                 var_idx = encode_var_index(n, t, i, j);
                 mat.at(0, 0) = 1;
                 mat.at(1, 1) = -1;

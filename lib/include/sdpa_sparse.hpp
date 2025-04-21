@@ -34,7 +34,7 @@ public:
         assert(0 <= var_idx && var_idx <= num_variables_);
         assert(0 <= block_idx && block_idx < num_blocks_);
 
-        blocks_[var_idx][block_idx] = mat;
+        blocks_[var_idx][block_idx] += mat;
     }
 
     int add_block(int block_size, bool is_diagonal = false) {

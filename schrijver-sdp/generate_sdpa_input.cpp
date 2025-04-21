@@ -11,10 +11,13 @@
 int beta(int n, int t, int i, int j, int k) {
     int ret = 0;
     int sgn = (t % 2 == 0 ? 1: -1);
+    std::cerr << "\t";
     for (int u = 0; u <= n; u++) {
-        ret += sgn * comb(u, t) * comb(n - 2 * k, u - k) * comb(n - k - u, i - u) * (n - k - u, j - u);
+        ret += sgn * comb(u, t) * comb(n - 2 * k, u - k) * comb(n - k - u, i - u) * comb(n - k - u, j - u);
+        std::cerr << ret << " ";
         sgn *= -1;
     }
+    std::cerr << std::endl;
     return ret;
 }
 
@@ -60,7 +63,7 @@ std::vector<int> objective(int n) {
     int var_count = (n + 1) * (n + 1) * (n + 1);
     std::vector<int> ret(var_count + 1, 0);
     for (int i = 0; i <= n; i++) {
-        int coeff = comb(n, i);
+        int coeff = -comb(n, i);
         int var_idx = encode_var_index(n, 0, i, 0);
         ret[var_idx] = coeff;
     }
@@ -82,11 +85,14 @@ int main() {
 
 
         std::vector<Matrix<float>> mat1(var_count + 1, Matrix<float>(sz));
-        for (int t = 0; t < n; t++) {
+        for (int t = 0; t <= n; t++) {
             for (int i = k; i <= n - k; i++) {
-                for (int j = k; j <= n - k; j++) {
+                for (int j = i; j <= n - k; j++) {
                     int var_idx = encode_var_index(n, t, i, j);
-                    mat1[var_idx].at(i - k, j - k) += beta(n, t, i, j, k);
+                    int b = beta(n, t, i, j, k);
+                    if (b == 0) continue;
+                    std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
+                    mat1[var_idx].at(i - k, j - k) += b;
                 }
             }
         }
@@ -98,7 +104,7 @@ int main() {
         std::vector<Matrix<float>> mat2(var_count + 1, Matrix<float>(sz));
         for (int t = 0; t < n; t++) {
             for (int i = k; i <= n - k; i++) {
-                for (int j = k; j <= n - k; j++) {
+                for (int j = i; j <= n - k; j++) {
                     if (i + j - 2 * t < 0 || n < i + j - 2 * t) continue;
                     int var_idx = encode_var_index(n, 0, i + j - 2 * t, 0);
                     mat2[var_idx].at(i - k, j - k) += beta(n, t, i, j, k);
@@ -209,6 +215,7 @@ int main() {
 
     // condition 4
     // まとめて1つのブロック
+    mat = Matrix<float>(2);
     block_idx = sdpa_input.add_block(2, true);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {

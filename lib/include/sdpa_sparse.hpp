@@ -65,7 +65,18 @@ public:
             std::cout << objective_[var_idx] << (var_idx < num_variables_ ? " ": "\n");
         }
 
-        for (int var_idx = 0; var_idx <= num_variables_; ++var_idx) {
+        // var_idx == 0 -> * (-1)
+        for (int block_idx = 0; block_idx < num_blocks_; ++block_idx) {
+            const auto& mat = blocks_[0][block_idx];
+            for (int row = 0; row < mat.rows(); ++row) {
+                for (int col = 0; col < mat.cols(); ++col) {
+                    if (mat.at(row, col) != 0.f) {
+                        std::cout << 0 << " " << block_idx + 1 << " " << row + 1 << " " << col + 1 << " " << (-1) * mat.at(row, col) << std::endl;
+                    }
+                }
+            }
+        }
+        for (int var_idx = 1; var_idx <= num_variables_; ++var_idx) {
             for (int block_idx = 0; block_idx < num_blocks_; ++block_idx) {
                 const auto& mat = blocks_[var_idx][block_idx];
                 for (int row = 0; row < mat.rows(); ++row) {

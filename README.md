@@ -1,4 +1,4 @@
-# combinatorial-playground
+# combinatorics-playground
 組合せ論関連の実験用コードを置くためのリポジトリ
 
 ## Docs links

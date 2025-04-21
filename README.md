@@ -7,5 +7,4 @@
 * [二項係数](docs/lib/combination.md)
 
 ### 論文関連ディレクトリ
-* [New Code Upper Bounds From the Terwilliger Algebra and Semidefinite Programming](docs/paper/schrijver.md)
-
+* [New Code Upper Bounds From the Terwilliger Algebra and Semidefinite Programming](schrijver-sdp)

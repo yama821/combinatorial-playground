@@ -120,6 +120,7 @@ int main() {
     // add linear condition
 
     // condition 1
+    std::cerr << "condition1: now block count = " << sdpa_input.block_size() << std::endl;
     int block_idx = sdpa_input.add_block(2, true);
     int var_idx = encode_var_index(n, 0, 0, 0);
     // [[x_{0, 0}^0, 0], [0, -x_{0, 0}^0]]
@@ -132,6 +133,7 @@ int main() {
     mat.at(1, 1) = 1;
     sdpa_input.update_block(0, block_idx, mat);
 
+    std::cerr << "condition2-1: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 2-1
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
@@ -156,6 +158,7 @@ int main() {
     }
 
     // condition 2-2
+    std::cerr << "condition2-2: now block count = " << sdpa_input.block_size() << std::endl;
     mat = Matrix<float>(1);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
@@ -185,6 +188,7 @@ int main() {
         }
     }
 
+    std::cerr << "condition3: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 3
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
@@ -212,12 +216,14 @@ int main() {
         }
     }
 
+    std::cerr << "condition4: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 4
     mat = Matrix<float>(2);
+    std::set<int> dropped_idx;
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
             for (int j = 0; j <= n; j++) {
-                // check if {i,j,i+j-2t} \cap {1,...,d-1} ?
+                // check if {i,j,i+j-2t} \cap {1,...,d-1} \neq \emptyset ?
                 int k = i + j - 2 * t;
                 bool flag = false;
                 flag |= (1 <= i && i < d);
@@ -226,13 +232,18 @@ int main() {
                 
                 if (!flag) continue;
                 
-                // std::cerr << "condition4: (t, i, j) = (" << t << ", " << i << ", " << j << ")" << std::endl;
                 
-                block_idx = sdpa_input.add_block(2, true);
                 var_idx = encode_var_index(n, t, i, j);
+                // sdpa_input.drop_variable(var_idx);
+                // dropped_idx.insert(var_idx);
+
+                block_idx = sdpa_input.add_block(2, true);
                 mat.at(0, 0) = 1;
                 mat.at(1, 1) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
+
+                // std::cerr << "condition4: (t, i, j, k) = (" << t << ", " << i << ", " << j << ", " << i + j - 2 * t << "), var_idx = " << var_idx << std::endl;
+                // std::cerr << "\tblock_idx = " << block_idx << std::endl;
             }
         }
     }

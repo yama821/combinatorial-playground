@@ -175,8 +175,8 @@ int main() {
                 mat.at(0, 0) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
 
-                // [-x_{j,0}^0}]
-                var_idx = encode_var_index(n, 0, 0, j);
+                // [-x_{j,0}^0]
+                var_idx = encode_var_index(n, 0, j, 0);
                 mat.at(0, 0) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
 

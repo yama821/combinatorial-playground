@@ -13,7 +13,7 @@ class SDPASparseInput{
     std::vector<int> block_struct_;
 
     std::vector<std::vector<Matrix<float>>> blocks_;
-    std::vector<int> objective_;
+    std::vector<float> objective_;
 
 public:
     SDPASparseInput() {}
@@ -49,7 +49,7 @@ public:
         return num_blocks_ - 1;
     }
 
-    void update_objective(std::vector<int>& objective) {
+    void update_objective(std::vector<float>& objective) {
         assert(static_cast<int>(objective.size()) == num_variables_ + 1);
         objective_ = objective;
     }

@@ -8,8 +8,8 @@
 #include "matrix.hpp"
 #include "sdpa_sparse.hpp"
 
-int beta(int n, int t, int i, int j, int k) {
-    int ret = 0;
+float beta(int n, int t, int i, int j, int k) {
+    float ret = 0;
     int sgn = (t % 2 == 0 ? 1: -1);
     // std::cerr << "\t";
     for (int u = 0; u <= n; u++) {
@@ -59,13 +59,12 @@ all_permutated_tuples(int n, int t, int i, int j) {
     return {used.begin(), used.end()};
 }
 
-std::vector<int> objective(int n) {
+std::vector<float> objective(int n) {
     int var_count = (n + 1) * (n + 1) * (n + 1);
-    std::vector<int> ret(var_count + 1, 0);
+    std::vector<float> ret(var_count + 1, 0);
     for (int i = 0; i <= n; i++) {
-        int coeff = -comb(n, i);
         int var_idx = encode_var_index(n, 0, i, 0);
-        ret[var_idx] = coeff;
+        ret[var_idx] = static_cast<float>(-comb(n, i));
     }
     return ret;
 }

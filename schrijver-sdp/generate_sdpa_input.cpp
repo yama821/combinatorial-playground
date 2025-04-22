@@ -163,6 +163,9 @@ int main() {
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
             for (int j = 0; j <= n; j++) {
+                if (!(t <= i && t <= j)) continue;
+                if (!(i + j - t <= n)) continue;
+
                 block_idx = sdpa_input.add_block(1, true);
 
                 // [x_{i,j}^t]
@@ -175,8 +178,8 @@ int main() {
                 mat.at(0, 0) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
 
-                // [-x_{j,0}^0]
-                var_idx = encode_var_index(n, 0, j, 0);
+                // [-x_{i+j-2t,0}^0]
+                var_idx = encode_var_index(n, 0, i+j-2*t, 0);
                 mat.at(0, 0) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
 

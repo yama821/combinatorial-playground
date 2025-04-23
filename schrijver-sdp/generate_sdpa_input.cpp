@@ -108,7 +108,7 @@ int main() {
         block_idx = sdpa_input.add_block(sz);
         // \sum_{t=0}^t \beta_{i,j,k}^t (x_{i+j-2t,0}^0 - x_{i,j}^t)
         std::vector<Matrix<float>> mat2(var_count + 1, Matrix<float>(sz));
-        for (int t = 0; t < n; t++) {
+        for (int t = 0; t <= n; t++) {
             for (int i = k; i <= n - k; i++) {
                 for (int j = i; j <= n - k; j++) {
                     if (i + j - 2 * t < 0 || n < i + j - 2 * t) continue;

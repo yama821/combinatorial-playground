@@ -26,6 +26,18 @@ public:
         return data_.at(row * cols_ + col);
     }
 
+    void pprint(bool std_out = false) const {
+        for (size_t row = 0; row < rows_; ++row) {
+            for (size_t col = 0; col < cols_; ++col) {
+                if (std_out) { 
+                    std::cout << at(row, col) << ( col < cols_ - 1 ? " ": "\n");
+                } else {
+                    std::cerr << at(row, col) << ( col < cols_ - 1 ? " ": "\n");
+                }
+            }
+        }
+    }
+
     Matrix<T>& operator+=(const Matrix<T>& other) {
         assert(this->rows() == other.rows());
         assert(this->cols() == other.cols());

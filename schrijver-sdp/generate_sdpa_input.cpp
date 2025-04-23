@@ -94,9 +94,9 @@ int main() {
                     int var_idx = encode_var_index(n, t, i, j);
                     int b = beta(n, t, i, j, k);
                     if (b == 0) continue;
-                    std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
-                    std::cerr << "  var_idx = " << var_idx << std::endl;
-                    std::cerr << "  (i - k, j - k) = (" << i - k << ", " << j - k << ")" << std::endl;
+                    // std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
+                    // std::cerr << "  var_idx = " << var_idx << std::endl;
+                    // std::cerr << "  (i - k, j - k) = (" << i - k << ", " << j - k << ")" << std::endl;
                     mat1[var_idx].at(i - k, j - k) += b;
                 }
             }
@@ -127,7 +127,7 @@ int main() {
     // add linear condition
 
     // condition 1
-    std::cerr << "condition1: now block count = " << sdpa_input.block_size() << std::endl;
+    // std::cerr << "condition1: now block count = " << sdpa_input.block_size() << std::endl;
     int block_idx = sdpa_input.add_block(2, true);
     int var_idx = encode_var_index(n, 0, 0, 0);
     // [[x_{0, 0}^0, 0], [0, -x_{0, 0}^0]]
@@ -140,7 +140,7 @@ int main() {
     mat.at(1, 1) = 1;
     sdpa_input.update_block(0, block_idx, mat);
 
-    std::cerr << "condition2-1: now block count = " << sdpa_input.block_size() << std::endl;
+    // std::cerr << "condition2-1: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 2-1
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
@@ -165,7 +165,7 @@ int main() {
     }
 
     // condition 2-2
-    std::cerr << "condition2-2: now block count = " << sdpa_input.block_size() << std::endl;
+    // std::cerr << "condition2-2: now block count = " << sdpa_input.block_size() << std::endl;
     mat = Matrix<float>(1);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
@@ -198,7 +198,7 @@ int main() {
         }
     }
 
-    std::cerr << "condition3: now block count = " << sdpa_input.block_size() << std::endl;
+    // std::cerr << "condition3: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 3
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
@@ -226,7 +226,7 @@ int main() {
         }
     }
 
-    std::cerr << "condition4: now block count = " << sdpa_input.block_size() << std::endl;
+    // std::cerr << "condition4: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 4
     mat = Matrix<float>(2);
     std::set<int> dropped_idx;

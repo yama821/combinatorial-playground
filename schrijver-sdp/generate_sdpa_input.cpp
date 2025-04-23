@@ -77,6 +77,10 @@ int main() {
     int var_count = (n + 1) * (n + 1) * (n + 1);
 
     SDPASparseInput sdpa_input(var_count);
+
+    auto obj = objective(n);
+    sdpa_input.update_objective(obj);
+
     for (int k = 0; k <= n / 2; k++) {
         // \sum_{t=0}^n \beta_{i,j,k}^t x_{i,j}^t 
         size_t sz = n - 2 * k + 1;
@@ -90,7 +94,9 @@ int main() {
                     int var_idx = encode_var_index(n, t, i, j);
                     int b = beta(n, t, i, j, k);
                     if (b == 0) continue;
-                    // std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
+                    std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
+                    std::cerr << "  var_idx = " << var_idx << std::endl;
+                    std::cerr << "  (i - k, j - k) = (" << i - k << ", " << j - k << ")" << std::endl;
                     mat1[var_idx].at(i - k, j - k) += b;
                 }
             }
@@ -99,6 +105,7 @@ int main() {
             sdpa_input.update_block(var_idx, block_idx, mat1[var_idx]);
         }
 
+        block_idx = sdpa_input.add_block(sz);
         // \sum_{t=0}^t \beta_{i,j,k}^t (x_{i+j-2t,0}^0 - x_{i,j}^t)
         std::vector<Matrix<float>> mat2(var_count + 1, Matrix<float>(sz));
         for (int t = 0; t < n; t++) {
@@ -250,9 +257,6 @@ int main() {
             }
         }
     }
-
-    auto obj = objective(n);
-    sdpa_input.update_objective(obj);
 
     sdpa_input.generate_sdpa_input();
 

@@ -13,14 +13,14 @@ class SDPASparseInput{
     std::vector<int> block_struct_;
 
     std::vector<std::vector<Matrix<float>>> blocks_;
-    std::vector<int> objective_;
+    std::vector<float> objective_;
 
 public:
     SDPASparseInput() {}
     SDPASparseInput(int num_variables): num_variables_(num_variables), num_blocks_(0), blocks_(num_variables + 1) {}
     SDPASparseInput(int num_variables, int num_blocks, std::vector<int>& block_struct):
         num_variables_(num_variables), num_blocks_(num_blocks), block_struct_(block_struct),
-        blocks_(num_variables + 1, std::vector<Matrix<float>>(num_blocks_)) 
+        blocks_(num_variables + 1, std::vector<Matrix<float>>(num_blocks_))
     {
         assert(num_blocks_ == static_cast<int>(blocks_.size()));
         for (int var_idx = 0; var_idx <= num_variables_; ++var_idx) {
@@ -49,7 +49,7 @@ public:
         return num_blocks_ - 1;
     }
 
-    void update_objective(std::vector<int>& objective) {
+    void update_objective(std::vector<float>& objective) {
         assert(static_cast<int>(objective.size()) == num_variables_ + 1);
         objective_ = objective;
     }
@@ -89,6 +89,8 @@ public:
             }
         }
     }
+
+    int block_size() { return num_blocks_; }
 };
 
 #endif // LIB_SDPA_SPARSE_HPP

@@ -8,8 +8,8 @@
 #include "matrix.hpp"
 #include "sdpa_sparse.hpp"
 
-int beta(int n, int t, int i, int j, int k) {
-    int ret = 0;
+float beta(int n, int t, int i, int j, int k) {
+    float ret = 0;
     int sgn = (t % 2 == 0 ? 1: -1);
     // std::cerr << "\t";
     for (int u = 0; u <= n; u++) {
@@ -59,13 +59,12 @@ all_permutated_tuples(int n, int t, int i, int j) {
     return {used.begin(), used.end()};
 }
 
-std::vector<int> objective(int n) {
+std::vector<float> objective(int n) {
     int var_count = (n + 1) * (n + 1) * (n + 1);
-    std::vector<int> ret(var_count + 1, 0);
+    std::vector<float> ret(var_count + 1, 0);
     for (int i = 0; i <= n; i++) {
-        int coeff = -comb(n, i);
         int var_idx = encode_var_index(n, 0, i, 0);
-        ret[var_idx] = coeff;
+        ret[var_idx] = static_cast<float>(-comb(n, i));
     }
     return ret;
 }
@@ -78,6 +77,10 @@ int main() {
     int var_count = (n + 1) * (n + 1) * (n + 1);
 
     SDPASparseInput sdpa_input(var_count);
+
+    auto obj = objective(n);
+    sdpa_input.update_objective(obj);
+
     for (int k = 0; k <= n / 2; k++) {
         // \sum_{t=0}^n \beta_{i,j,k}^t x_{i,j}^t 
         size_t sz = n - 2 * k + 1;
@@ -92,6 +95,8 @@ int main() {
                     int b = beta(n, t, i, j, k);
                     if (b == 0) continue;
                     // std::cerr << "beta(" << n << "," << t << "," << i << "," << j << "," << k << ") = " << b << std::endl;
+                    // std::cerr << "  var_idx = " << var_idx << std::endl;
+                    // std::cerr << "  (i - k, j - k) = (" << i - k << ", " << j - k << ")" << std::endl;
                     mat1[var_idx].at(i - k, j - k) += b;
                 }
             }
@@ -100,9 +105,10 @@ int main() {
             sdpa_input.update_block(var_idx, block_idx, mat1[var_idx]);
         }
 
+        block_idx = sdpa_input.add_block(sz);
         // \sum_{t=0}^t \beta_{i,j,k}^t (x_{i+j-2t,0}^0 - x_{i,j}^t)
         std::vector<Matrix<float>> mat2(var_count + 1, Matrix<float>(sz));
-        for (int t = 0; t < n; t++) {
+        for (int t = 0; t <= n; t++) {
             for (int i = k; i <= n - k; i++) {
                 for (int j = i; j <= n - k; j++) {
                     if (i + j - 2 * t < 0 || n < i + j - 2 * t) continue;
@@ -121,6 +127,7 @@ int main() {
     // add linear condition
 
     // condition 1
+    // std::cerr << "condition1: now block count = " << sdpa_input.block_size() << std::endl;
     int block_idx = sdpa_input.add_block(2, true);
     int var_idx = encode_var_index(n, 0, 0, 0);
     // [[x_{0, 0}^0, 0], [0, -x_{0, 0}^0]]
@@ -133,6 +140,7 @@ int main() {
     mat.at(1, 1) = 1;
     sdpa_input.update_block(0, block_idx, mat);
 
+    // std::cerr << "condition2-1: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 2-1
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
@@ -157,10 +165,14 @@ int main() {
     }
 
     // condition 2-2
+    // std::cerr << "condition2-2: now block count = " << sdpa_input.block_size() << std::endl;
     mat = Matrix<float>(1);
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
             for (int j = 0; j <= n; j++) {
+                if (!(t <= i && t <= j)) continue;
+                if (!(i + j - t <= n)) continue;
+
                 block_idx = sdpa_input.add_block(1, true);
 
                 // [x_{i,j}^t]
@@ -173,8 +185,8 @@ int main() {
                 mat.at(0, 0) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
 
-                // [-x_{j,0}^0}]
-                var_idx = encode_var_index(n, 0, 0, j);
+                // [-x_{i+j-2t,0}^0]
+                var_idx = encode_var_index(n, 0, i+j-2*t, 0);
                 mat.at(0, 0) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
 
@@ -186,6 +198,7 @@ int main() {
         }
     }
 
+    // std::cerr << "condition3: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 3
     mat = Matrix<float>(2);
     for (int t = 0; t <= n; t++) {
@@ -213,12 +226,14 @@ int main() {
         }
     }
 
+    // std::cerr << "condition4: now block count = " << sdpa_input.block_size() << std::endl;
     // condition 4
     mat = Matrix<float>(2);
+    std::set<int> dropped_idx;
     for (int t = 0; t <= n; t++) {
         for (int i = 0; i <= n; i++) {
             for (int j = 0; j <= n; j++) {
-                // check if {i,j,i+j-2t} \cap {1,...,d-1} ?
+                // check if {i,j,i+j-2t} \cap {1,...,d-1} \neq \emptyset ?
                 int k = i + j - 2 * t;
                 bool flag = false;
                 flag |= (1 <= i && i < d);
@@ -227,19 +242,21 @@ int main() {
                 
                 if (!flag) continue;
                 
-                // std::cerr << "condition4: (t, i, j) = (" << t << ", " << i << ", " << j << ")" << std::endl;
                 
-                block_idx = sdpa_input.add_block(2, true);
                 var_idx = encode_var_index(n, t, i, j);
+                // sdpa_input.drop_variable(var_idx);
+                // dropped_idx.insert(var_idx);
+
+                block_idx = sdpa_input.add_block(2, true);
                 mat.at(0, 0) = 1;
                 mat.at(1, 1) = -1;
                 sdpa_input.update_block(var_idx, block_idx, mat);
+
+                // std::cerr << "condition4: (t, i, j, k) = (" << t << ", " << i << ", " << j << ", " << i + j - 2 * t << "), var_idx = " << var_idx << std::endl;
+                // std::cerr << "\tblock_idx = " << block_idx << std::endl;
             }
         }
     }
-
-    auto obj = objective(n);
-    sdpa_input.update_objective(obj);
 
     sdpa_input.generate_sdpa_input();
 
